@@ -32,39 +32,37 @@ def grap_inputs():
 
 
 def encoder(inputs, rnn_size, number_of_layers, encoder_seq_len, keep_probs, encoder_embed_size, encoder_vocab_size):
+	
+'''
+	Used to define encoder of the seq2seq model (The encoder is made of simple dynamic RNN network).
 
-	'''
-		Used to define encoder of the seq2seq model (The encoder is made of simple dynamic RNN network).
+	Inputs:
+		inputs -
+		rnn_siz - number of units in the RNN layer
+		number_of_layer - number of RNN layers that the model uses
+		encoder_seq_len - vector of lengths (got from placeholder)
+		keep_probs - dropout rate
+		encoder_embed_size - size of embedding vector for encoder part
+		encoder_vocab_size - number of different words that the model uses in a vocabulary
+	
+	Outputs:
+		encoder_outputs -
+		encoder_states - internal states from the RNN layer(s)
 
-		Inputs:
-			inputs -
-			rnn_siz - number of units in the RNN layer
-			number_of_layer - number of RNN layers that the model uses
-			encoder_seq_len - vector of lengths (got from placeholder)
-			keep_probs - dropout rate
-			encoder_embed_size - size of embedding vector for encoder part
-			encoder_vocab_size - number of different words that the model uses in a vocabulary
-		
-		Outputs:
-			encoder_outputs -
-			encoder_states - internal states from the RNN layer(s)
-
-	'''
-    
-    def cell(units, rate):
-        layer = tf.contrib.rnn.BasicLSTMCell(units)
-        return tf.contrib.rnn.DropoutWrapper(layer, rate)
-    
+'''
     encoder_cell = tf.contrib.rnn.MultiRNNCell([cell(rnn_size, keep_probs) for _ in range(number_of_layers)])
-     
+ 
     encoder_embedings = tf.contrib.layers.embed_sequence(inputs, encoder_vocab_size, encoder_embed_size) #used to create embeding layer for the encoder
-    
-    encoder_outputs, encoder_states = tf.nn.dynamic_rnn(encoder_cell, 
-                                                        encoder_embedings, 
-                                                        encoder_seq_len, 
-                                                        dtype=tf.float32)
-    
-    return encoder_outputs, encoder_states
+
+    encoder_outputs, encoder_states = tf.nn.dynamic_rnn(encoder_cell,encoder_embedings, encoder_seq_len,dtype=tf.float32)
+
+
+return encoder_outputs, encoder_states
+def cell(units, rate):
+    layer = tf.contrib.rnn.BasicLSTMCell(units)
+    return tf.contrib.rnn.DropoutWrapper(layer,rate)
+
+
 
 
 def decoder_inputs_preprocessing(targets, word_to_id, batch_size):
